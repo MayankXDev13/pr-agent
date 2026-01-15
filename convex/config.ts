@@ -1,0 +1,3 @@
+// Convex configuration
+export default {};
+
