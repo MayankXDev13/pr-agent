@@ -149,17 +149,34 @@ export default defineSchema({
     .index("by_userId", ["userId"])
     .index("by_month", ["userId", "createdAt"]),
 
-  conversations: defineTable({
+  qaSessions: defineTable({
     repoId: v.id("repositories"),
-    userId: v.string(),
     question: v.string(),
-    answer: v.string(),
-    contextFiles: v.array(v.string()),
-    model: v.string(),
+    answer: v.optional(v.string()),
+    status: v.string(),
+    modelUsed: v.string(),
     tokensUsed: v.number(),
-    createdAt: v.number(),
+    startedAt: v.number(),
+    completedAt: v.optional(v.number()),
   })
     .index("by_repoId", ["repoId"]),
+
+  qaMessages: defineTable({
+    sessionId: v.id("qaSessions"),
+    role: v.string(),
+    content: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_sessionId", ["sessionId"]),
+
+  qaSources: defineTable({
+    sessionId: v.id("qaSessions"),
+    file: v.string(),
+    line: v.number(),
+    content: v.string(),
+    relevanceScore: v.number(),
+  })
+    .index("by_sessionId", ["sessionId"]),
 
   stripeEvents: defineTable({
     eventId: v.string(),
