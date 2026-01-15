@@ -1,1 +1,1 @@
-// Convex functions will be deployed via 'bunx convex dev'
+// Convex functions deployed via bunx convex dev
