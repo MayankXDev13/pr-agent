@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/auth";
-import { ConvexHttpClient } from "convex/browser";
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+let convex: any = null;
+
+if (typeof window === "undefined" && process.env.NEXT_PUBLIC_CONVEX_URL) {
+  import("convex/browser").then(({ ConvexHttpClient }) => {
+    convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+  });
+}
 
 export async function GET() {
   try {
@@ -12,6 +17,10 @@ export async function GET() {
 
     if (!user?.isAdmin) {
       return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+    }
+
+    if (!convex) {
+      return NextResponse.json({ error: "Convex not configured" }, { status: 500 });
     }
 
     const health = await convex.query("admin:getSystemHealth" as any);

@@ -17,6 +17,8 @@ export function FeedbackButtons({
 }: FeedbackButtonsProps) {
   const [vote, setVote] = useState<"up" | "down" | null>(null);
   const [loading, setLoading] = useState(false);
+  const [upvotesCount, setUpvotesCount] = useState(upvotes);
+  const [downvotesCount, setDownvotesCount] = useState(downvotes);
 
   const handleVote = async (feedback: "up" | "down") => {
     if (loading || vote === feedback) return;
@@ -31,6 +33,11 @@ export function FeedbackButtons({
 
       if (response.ok) {
         setVote(feedback);
+        if (feedback === "up") {
+          setUpvotesCount((prev) => prev + 1);
+        } else {
+          setDownvotesCount((prev) => prev + 1);
+        }
         onFeedback?.(feedback);
       }
     } catch (error) {
@@ -54,7 +61,7 @@ export function FeedbackButtons({
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
         </svg>
-        <span>{vote === "up" ? upvotes + 1 : upvotes}</span>
+        <span>{upvotesCount}</span>
       </button>
 
       <button
@@ -69,7 +76,7 @@ export function FeedbackButtons({
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
-        <span>{vote === "down" ? downvotes + 1 : downvotes}</span>
+        <span>{downvotesCount}</span>
       </button>
     </div>
   );
@@ -87,15 +94,27 @@ export function PatternFeedback({
   negativeFeedback,
 }: PatternFeedbackProps) {
   const [feedback, setFeedback] = useState<"up" | "down" | null>(null);
+  const [positiveCount, setPositiveCount] = useState(positiveFeedback);
+  const [negativeCount, setNegativeCount] = useState(negativeFeedback);
 
   const handleFeedback = async (type: "up" | "down") => {
+    if (feedback === type) return;
+
     try {
-      await fetch("/api/patterns/feedback", {
+      const response = await fetch("/api/patterns/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ patternId, feedback: type }),
       });
-      setFeedback(type);
+
+      if (response.ok) {
+        setFeedback(type);
+        if (type === "up") {
+          setPositiveCount((prev) => prev + 1);
+        } else {
+          setNegativeCount((prev) => prev + 1);
+        }
+      }
     } catch (error) {
       console.error("Failed to submit pattern feedback:", error);
     }
@@ -110,7 +129,7 @@ export function PatternFeedback({
           feedback === "up" ? "bg-green-100 text-green-700" : "hover:bg-gray-100"
         }`}
       >
-        👍 {positiveFeedback + (feedback === "up" ? 1 : 0)}
+        👍 {positiveCount}
       </button>
       <button
         onClick={() => handleFeedback("down")}
@@ -118,7 +137,7 @@ export function PatternFeedback({
           feedback === "down" ? "bg-red-100 text-red-700" : "hover:bg-gray-100"
         }`}
       >
-        👎 {negativeFeedback + (feedback === "down" ? 1 : 0)}
+        👎 {negativeCount}
       </button>
     </div>
   );

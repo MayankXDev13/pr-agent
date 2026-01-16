@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../lib/auth";
-import { ConvexHttpClient } from "convex/browser";
 import { generateAnswer } from "../../../lib/llm";
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+let convex: any = null;
+
+async function getConvex() {
+  if (convex) return convex;
+  if (typeof window !== "undefined") return null;
+  if (!process.env.NEXT_PUBLIC_CONVEX_URL) return null;
+  const { ConvexHttpClient } = await import("convex/browser");
+  convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+  return convex;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,17 +30,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const repo = await convex.query("repos:getById" as any, { id: repoId });
+    const client = await getConvex();
+    if (!client) {
+      return NextResponse.json({ error: "Convex not configured" }, { status: 500 });
+    }
+
+    const repo = await client.query("repos:getById" as any, { id: repoId });
     if (!repo || repo.userId !== (session.user as any).id) {
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }
 
-    const sessionId = await convex.mutation("qa:createSession" as any, {
+    const qaSessionId = await client.mutation("qa:createSession" as any, {
       repoId,
       question,
     });
 
-    const relevantChunks = await convex.query("index:search" as any, {
+    const relevantChunks = await client.query("index:search" as any, {
       repoId,
       query: question,
       limit: 5,
@@ -57,8 +70,8 @@ export async function POST(request: NextRequest) {
 
     const result = await generateAnswer(messages as any);
 
-    await convex.mutation("qa:updateWithAnswer" as any, {
-      sessionId,
+    await client.mutation("qa:updateWithAnswer" as any, {
+      sessionId: qaSessionId,
       answer: result.text,
       sources: relevantChunks.map((chunk: any) => ({
         file: chunk.filePath,
@@ -67,8 +80,8 @@ export async function POST(request: NextRequest) {
       })),
     });
 
-    const updatedSession = await convex.query("qa:getSession" as any, {
-      sessionId,
+    const updatedSession = await client.query("qa:getSession" as any, {
+      sessionId: qaSessionId,
     });
 
     return NextResponse.json(updatedSession);
@@ -98,7 +111,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const sessions = await convex.query("qa:listSessions" as any, {
+    const client = await getConvex();
+    if (!client) {
+      return NextResponse.json({ error: "Convex not configured" }, { status: 500 });
+    }
+
+    const sessions = await client.query("qa:listSessions" as any, {
       repoId,
     });
 

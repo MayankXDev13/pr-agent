@@ -21,18 +21,30 @@ interface Review {
 
 interface ReviewListProps {
   repoFullName?: string;
+  repoId?: string;
 }
 
-export function ReviewList({ repoFullName }: ReviewListProps) {
+export function ReviewList({ repoFullName, repoId }: ReviewListProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     loadReviews();
-  }, [repoFullName]);
+  }, [repoId]);
 
   const loadReviews = async () => {
-    setIsLoading(false);
+    try {
+      const params = repoId ? `?repoId=${repoId}` : "";
+      const response = await fetch(`/api/reviews${params}`);
+      if (response.ok) {
+        const data = await response.json();
+        setReviews(data);
+      }
+    } catch (error) {
+      console.error("Failed to load reviews:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const formatDate = (timestamp: number) => {
@@ -79,7 +91,7 @@ export function ReviewList({ repoFullName }: ReviewListProps) {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 0 0118 0z"
           />
         </svg>
         <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
