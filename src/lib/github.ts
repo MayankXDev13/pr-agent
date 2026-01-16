@@ -198,3 +198,158 @@ export async function createPullRequestReview(
   
   return data.id;
 }
+
+export async function getFileContent(
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  path: string,
+  ref: string
+): Promise<string> {
+  try {
+    const { data } = await octokit.repos.getContent({
+      owner,
+      repo,
+      path,
+      ref,
+    });
+    
+    if ("content" in data && typeof data.content === "string") {
+      return Buffer.from(data.content, "base64").toString("utf-8");
+    }
+    return "";
+  } catch {
+    return "";
+  }
+}
+
+export async function getRepoTree(
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  branch: string
+): Promise<Array<{ path: string; type: "file" | "dir" }>> {
+  try {
+    const { data } = await octokit.git.getTree({
+      owner,
+      repo,
+      tree_sha: branch,
+      recursive: "true",
+    });
+    
+    return data.tree
+      .filter((item) => item.type === "blob" && isSourceFile(item.path || ""))
+      .map((item) => ({
+        path: item.path || "",
+        type: "file" as const,
+      }));
+  } catch {
+    return [];
+  }
+}
+
+function isSourceFile(path: string): boolean {
+  const sourceExtensions = [
+    ".ts", ".tsx", ".js", ".jsx", ".py", ".go", ".rs", ".java",
+    ".cpp", ".c", ".h", ".cs", ".rb", ".php", ".swift", ".kt",
+  ];
+  const skipPatterns = [
+    "node_modules", ".git", "dist", "build", ".next", "coverage",
+    "package-lock.json", "yarn.lock", "Cargo.lock", "go.sum",
+  ];
+  
+  const ext = path.substring(path.lastIndexOf("."));
+  const hasValidExt = sourceExtensions.includes(ext);
+  const skipPath = skipPatterns.some((pattern) => path.includes(pattern));
+  
+  return hasValidExt && !skipPath;
+}
+
+export function findRelatedFiles(
+  changedFiles: string[],
+  allFiles: Array<{ path: string; type: "file" | "dir" }>
+): string[] {
+  const changedSet = new Set(changedFiles);
+  const result: string[] = [];
+  const added = new Set<string>();
+  
+  for (const changedFile of changedFiles) {
+    const parts = changedFile.split("/");
+    for (let i = parts.length - 1; i > 0; i--) {
+      const dir = parts.slice(0, i).join("/");
+      if (added.has(dir)) continue;
+      
+      const related = allFiles
+        .filter((f) => f.path.startsWith(dir + "/") && !changedSet.has(f.path))
+        .slice(0, 5);
+      
+      for (const r of related) {
+        if (!added.has(r.path)) {
+          result.push(r.path);
+          added.add(r.path);
+        }
+      }
+    }
+  }
+  
+  return result.slice(0, 20);
+}
+
+export async function getRelatedCode(
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  changedFiles: string[],
+  branch: string
+): Promise<Array<{ path: string; content: string }>> {
+  const tree = await getRepoTree(octokit, owner, repo, branch);
+  const relatedPaths = findRelatedFiles(changedFiles, tree);
+  
+  const contents = await Promise.all(
+    relatedPaths.map(async (path) => ({
+      path,
+      content: await getFileContent(octokit, owner, repo, path, branch),
+    }))
+  );
+  
+  return contents.filter((c) => c.content.length > 0);
+}
+
+export async function postInlineComments(
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  prNumber: number,
+  commitId: string,
+  comments: Array<{
+    path: string;
+    line: number;
+    body: string;
+    side?: "LEFT" | "RIGHT";
+  }>
+): Promise<number[]> {
+  if (comments.length === 0) return [];
+  
+  try {
+    const reviewComments = comments.map((c: { path: string; line: number; body: string; side?: string }) => ({
+      path: c.path,
+      line: c.line,
+      body: c.body,
+      side: c.side,
+    }));
+    
+    await octokit.pulls.createReview({
+      owner,
+      repo,
+      pull_number: prNumber,
+      commit_id: commitId,
+      comments: reviewComments,
+      event: "COMMENT",
+    });
+    
+    return comments.map((_, i) => i + 1);
+  } catch (error) {
+    console.error("Failed to post inline comments:", error);
+    return [];
+  }
+}

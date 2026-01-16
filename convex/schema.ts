@@ -46,30 +46,28 @@ export default defineSchema({
 
   reviews: defineTable({
     prId: v.id("pullRequests"),
-    modelUsed: v.string(),
+    repoId: v.id("repos"),
+    score: v.number(),
+    securityScore: v.number(),
+    bugScore: v.number(),
+    styleScore: v.number(),
     summary: v.string(),
     findings: v.array(v.object({
-      type: v.union(
-        v.literal("bug"),
-        v.literal("security"),
-        v.literal("style"),
-        v.literal("suggestion"),
-        v.literal("info")
-      ),
+      type: v.union(v.literal("security"), v.literal("bug"), v.literal("style"), v.literal("breaking")),
       file: v.string(),
       line: v.optional(v.number()),
+      severity: v.union(v.literal("critical"), v.literal("high"), v.literal("medium"), v.literal("low")),
       message: v.string(),
+      suggestion: v.string(),
       codeSnippet: v.optional(v.string()),
-      severity: v.union(
-        v.literal("low"),
-        v.literal("medium"),
-        v.literal("high"),
-        v.literal("critical")
-      ),
     })),
+    commentsPosted: v.number(),
+    modelUsed: v.string(),
     reviewTimeMs: v.number(),
     createdAt: v.number(),
-  }).index("by_prId", ["prId"]),
+  }).index("by_repoId", ["repoId"])
+    .index("by_createdAt", ["createdAt"])
+    .index("by_score", ["repoId", "score"]),
 
   admin_users: defineTable({
     userId: v.string(),

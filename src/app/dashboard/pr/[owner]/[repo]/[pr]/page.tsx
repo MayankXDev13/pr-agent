@@ -13,7 +13,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { useState, useCallback } from "react";
-import FileDiffViewer from "@/components/dashboard/FileDiffViewer";
+import FileDiffViewer from "@/src/components/dashboard/FileDiffViewer";
 
 interface Finding {
   type: string;
