@@ -1,8 +1,18 @@
 import { z } from "zod";
+import { createOpenAI } from "@ai-sdk/openai";
+import { generateText } from "ai";
 
 const FREE_MODEL = "meta-llama/llama-3.2-3b-instruct";
 const FALLBACK_MODEL = "microsoft/phi-4";
-const OPENROUTER_API = "https://openrouter.ai/api/v1";
+
+const openrouter = createOpenAI({
+  baseURL: "https://openrouter.ai/api/v1",
+  apiKey: process.env.OPENROUTER_API_KEY ?? "",
+  headers: {
+    "HTTP-Referer": process.env.AUTH_URL ?? "http://localhost:3000",
+    "X-Title": "PR Agent",
+  },
+});
 
 const FINDING_SCHEMA = z.object({
   type: z.enum(["security", "bug", "style", "breaking"]),
@@ -79,33 +89,6 @@ export interface ReviewFindings {
   }>;
 }
 
-async function callOpenRouter(prompt: string, model: string = FREE_MODEL): Promise<string> {
-  const response = await fetch(OPENROUTER_API, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      "HTTP-Referer": process.env.AUTH_URL || "http://localhost:3000",
-      "X-Title": "PR Agent",
-    },
-    body: JSON.stringify({
-      model,
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 8192,
-      temperature: 0.2,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    console.error(`OpenRouter error: ${error}`);
-    throw new Error(`OpenRouter error: ${error}`);
-  }
-
-  const data = await response.json();
-  return data.choices[0]?.message?.content || "";
-}
-
 function buildReviewPrompt(context: ReviewContext): string {
   const diffsText = context.diffs
     .map((d) => `=== ${d.filename} ===
@@ -172,16 +155,32 @@ Only include issues that are genuinely problematic. Do not flag stylistic prefer
 export async function analyzePR(context: ReviewContext): Promise<ReviewFindings> {
   const prompt = buildReviewPrompt(context);
   
-  try {
-    let response = await callOpenRouter(prompt);
+    try {
+      let text = "";
+      
+      try {
+        const result = await generateText({
+          model: openrouter(FREE_MODEL),
+          prompt,
+          temperature: 0.2,
+        });
+        text = result.text;
+      } catch {
+        console.warn(`Primary model ${FREE_MODEL} failed, trying fallback ${FALLBACK_MODEL}`);
+        const result = await generateText({
+          model: openrouter(FALLBACK_MODEL),
+          prompt,
+          temperature: 0.2,
+        });
+        text = result.text;
+      }
     
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.warn("No JSON found in LLM response, trying fallback model");
-      response = await callOpenRouter(prompt, FALLBACK_MODEL);
+      throw new Error("No JSON found in response");
     }
     
-    const parsed = REVIEW_RESPONSE_SCHEMA.parse(JSON.parse(jsonMatch?.[0] || "{}"));
+    const parsed = REVIEW_RESPONSE_SCHEMA.parse(JSON.parse(jsonMatch[0]));
     
     return {
       security: parsed.security.map((f) => ({
