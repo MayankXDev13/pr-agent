@@ -1,11 +1,11 @@
-import NextAuth, { AuthOptions } from "next-auth";
+import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 
-export const authOptions: AuthOptions = {
+const authOptions = {
   providers: [
     GithubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      clientId: process.env.GITHUB_CLIENT_ID || "dummy-client-id",
+      clientSecret: process.env.GITHUB_CLIENT_SECRET || "dummy-client-secret",
       authorization: {
         params: {
           scope: "repo read:user read:org admin:repo_hook",
@@ -14,21 +14,21 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, account, profile }) {
+    async jwt({ token, account, profile }: any) {
       if (account) {
         token.accessToken = account.access_token;
-        token.githubUsername = (profile as any)?.login;
+        token.githubUsername = profile?.login;
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: any) {
       return {
         ...session,
         user: {
           ...session.user,
-          id: token.sub as string,
-          githubUsername: token.githubUsername as string,
-          accessToken: token.accessToken as string,
+          id: token.sub,
+          githubUsername: token.githubUsername,
+          accessToken: token.accessToken,
         },
       };
     },
@@ -36,6 +36,13 @@ export const authOptions: AuthOptions = {
   pages: {
     signIn: "/signin",
   },
+  secret: process.env.NEXTAUTH_SECRET || "dummy-secret-key-for-development",
 };
 
-export const { handlers, auth, signIn, signOut } = NextAuth(authOptions);
+const nextAuth = NextAuth(authOptions);
+
+export const handlers = nextAuth;
+export const auth = nextAuth.auth;
+export const signIn = nextAuth.signIn;
+export const signOut = nextAuth.signOut;
+export { authOptions };
