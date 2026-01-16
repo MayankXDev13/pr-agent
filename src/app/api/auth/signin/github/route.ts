@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   const providerId = url.searchParams.get("provider") || "github";
 
   const response = await handler.handler.POST(
-    new Request(`https://example.com/api/auth/signin/${providerId}`, {
+    new Request(`${process.env.AUTH_URL}/api/auth/signin/${providerId}`, {
       method: "POST",
       headers: request.headers,
     })
