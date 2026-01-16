@@ -1,0 +1,6 @@
+{
+  "framework": "nextjs",
+  "functions": "convex/",
+  "source": "src",
+  "tsconfig": "tsconfig.json"
+}
