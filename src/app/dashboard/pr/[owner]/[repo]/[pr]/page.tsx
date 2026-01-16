@@ -8,12 +8,12 @@ import {
   Clock,
   User,
   GitBranch,
-  FileText,
   ExternalLink,
   AlertTriangle,
   CheckCircle,
 } from "lucide-react";
 import { useState, useCallback } from "react";
+import FileDiffViewer from "@/components/dashboard/FileDiffViewer";
 
 interface Finding {
   type: string;
@@ -30,6 +30,14 @@ interface ReviewResult {
   findings?: Finding[];
   reviewTimeMs?: number;
   error?: string;
+}
+
+interface FileChange {
+  filename: string;
+  status: "added" | "modified" | "deleted" | "renamed";
+  additions: number;
+  deletions: number;
+  patch?: string;
 }
 
 const MOCK_PR = {
@@ -50,11 +58,104 @@ const MOCK_PR = {
 
 const MOCK_REVIEWS: any[] = [];
 
-const MOCK_FILES = [
-  { name: "src/lib/auth.ts", additions: 45, deletions: 12 },
-  { name: "src/components/Login.tsx", additions: 28, deletions: 5 },
-  { name: "src/app/api/auth/route.ts", additions: 15, deletions: 3 },
-  { name: "README.md", additions: 8, deletions: 2 },
+const MOCK_FILES: FileChange[] = [
+  {
+    filename: "src/lib/auth.ts",
+    status: "modified",
+    additions: 45,
+    deletions: 12,
+    patch: `@@ -10,8 +10,10 @@ import { Octokit } from "@octokit/rest";
+ 
+ export interface AuthConfig {
+   clientId: string;
+   clientSecret: string;
+   redirectUri: string;
++  scope: string[];
++  state: string;
+ }
+ 
+ export class GitHubAuth {
+   private config: AuthConfig;
+@@ -38,6 +40,10 @@ export class GitHubAuth {
+     return config.redirectUri;
+   }
+ 
++  validateState(state: string): boolean {
++    return this.config.state === state;
++  }
++
+   async exchangeCodeForToken(code: string): Promise<string> {
+     const response = await fetch("https://github.com/login/oauth/access_token", {
+       method: "POST",
+@@ -45,7 +51,7 @@ export class GitHubAuth {
+         "Content-Type": "application/json",
+         Accept: "application/json",
+       },
+-      body: JSON.stringify({ client_id, client_secret, code }),
++      body: JSON.stringify({ client_id, client_secret, code, redirect_uri }),
+     });
+ 
+     const data = await response.json();`,
+  },
+  {
+    filename: "src/components/Login.tsx",
+    status: "modified",
+    additions: 28,
+    deletions: 5,
+    patch: `@@ -70,8 +70,15 @@ export default function LoginPage() {
+     }
+   };
+ 
++  if (error) {
++    return (
++      <div className="error">
++        Authentication failed: {error}
++      </div>
++    );
++  }
++
+   return (
+     <div className="login-container">
+       <h1>Sign in with GitHub</h1>`,
+  },
+  {
+    filename: "src/app/api/auth/route.ts",
+    status: "modified",
+    additions: 15,
+    deletions: 3,
+    patch: `@@ -5,10 +5,12 @@ import { GitHubAuth } from "@/lib/auth";
+ 
+ const auth = new GitHubAuth({
+   clientId: process.env.GITHUB_CLIENT_ID!,
+   clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+   redirectUri: process.env.AUTH_URL + "/api/auth/callback",
++  scope: ["user:email", "read:org"],
++  state: generateRandomString(32),
+ });
+ 
+ export async function GET(request: Request) {`,
+  },
+  {
+    filename: "README.md",
+    status: "modified",
+    additions: 8,
+    deletions: 2,
+    patch: `@@ -1,5 +1,11 @@
+ # PR Agent
+ 
++## Features
++
++- AI-powered code review
++- GitHub OAuth integration
++- Real-time streaming reviews
++- Multi-severity findings
++
+ ## Getting Started
+ 
+ \`\`\`bash
+ bun install
+\`\`\``,
+  },
 ];
 
 function getSeverityColor(severity: string): string {
@@ -62,7 +163,7 @@ function getSeverityColor(severity: string): string {
     case "critical": return "bg-red-100 text-red-800 border-red-200";
     case "high": return "bg-orange-100 text-orange-800 border-orange-200";
     case "medium": return "bg-yellow-100 text-yellow-800 border-yellow-200";
-    case "low": return "bg-green-100 text-green-800 border-green-200";
+    case "bg-green-100 text-green-800low": return " border-green-200";
     default: return "bg-gray-100 text-gray-800 border-gray-200";
   }
 }
@@ -106,7 +207,8 @@ export default function PRDetailPage() {
 
   const pr = { ...MOCK_PR, prNumber };
   const reviews = MOCK_REVIEWS;
-  
+  const files = MOCK_FILES;
+
   const [isReviewing, setIsReviewing] = useState(false);
   const [result, setResult] = useState<ReviewResult | null>(null);
   const [elapsed, setElapsed] = useState(0);
@@ -123,16 +225,16 @@ export default function PRDetailPage() {
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 3000));
-      
+
       const mockResult: ReviewResult = {
         success: true,
-        summary: "This PR adds a new authentication system with OAuth support. The changes look well-structured but have some security concerns around token handling.",
+        summary: "This PR adds a new authentication system with OAuth support. The changes look well-structured but have some security concerns around token handling and state validation.",
         findings: [
           {
             type: "security",
             file: "src/lib/auth.ts",
             line: 42,
-            message: "Token expiration should be validated before processing",
+            message: "Token expiration should be validated before processing the OAuth response",
             codeSnippet: "if (token.expiresAt < Date.now())",
             severity: "high",
           },
@@ -140,24 +242,34 @@ export default function PRDetailPage() {
             type: "bug",
             file: "src/components/Login.tsx",
             line: 78,
-            message: "Missing error handling for failed OAuth callback",
+            message: "Missing error handling for failed OAuth callback - null check needed for error parameter",
+            codeSnippet: "if (error) { return <Error message={error} />; }",
             severity: "medium",
           },
           {
             type: "style",
             file: "src/lib/auth.ts",
             line: 15,
-            message: "Inconsistent indentation (spaces vs tabs)",
+            message: "Inconsistent indentation - mixed tabs and spaces in auth.ts",
             severity: "low",
           },
           {
             type: "suggestion",
             file: "src/lib/auth.ts",
-            message: "Consider adding rate limiting for failed attempts",
+            line: 22,
+            message: "Consider adding rate limiting for failed OAuth attempts to prevent abuse",
             severity: "medium",
           },
+          {
+            type: "security",
+            file: "src/app/api/auth/route.ts",
+            line: 12,
+            message: "State parameter should be validated against stored session state to prevent CSRF attacks",
+            codeSnippet: "const state = request.nextUrl.searchParams.get('state');",
+            severity: "high",
+          },
         ],
-        reviewTimeMs: 2500,
+        reviewTimeMs: 2850,
       };
 
       setResult(mockResult);
@@ -229,29 +341,7 @@ export default function PRDetailPage() {
 
       <div className="grid grid-cols-3 gap-6">
         <div className="col-span-2 space-y-6">
-          <div className="border border-gray-200 rounded-lg p-6">
-            <h2 className="text-lg font-semibold mb-4">Changed Files</h2>
-            <p className="text-sm text-gray-600 mb-4">
-              {pr.changedFiles} files changed
-            </p>
-            <div className="space-y-2">
-              {MOCK_FILES.map((file) => (
-                <div
-                  key={file.name}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors cursor-pointer"
-                >
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-5 w-5 text-gray-500" />
-                    <span className="font-mono text-sm">{file.name}</span>
-                  </div>
-                  <div className="flex items-center gap-4 text-sm">
-                    <span className="text-green-600">+{file.additions}</span>
-                    <span className="text-red-600">-{file.deletions}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <FileDiffViewer files={files} />
 
           <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -422,6 +512,18 @@ export default function PRDetailPage() {
           <div className="border border-gray-200 rounded-lg p-6">
             <h3 className="font-semibold mb-4">Reviewers</h3>
             <p className="text-sm text-gray-600">No reviewers assigned yet</p>
+          </div>
+
+          <div className="border border-gray-200 rounded-lg p-6">
+            <h3 className="font-semibold mb-4">Labels</h3>
+            <div className="flex flex-wrap gap-2">
+              <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                feature
+              </span>
+              <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
+                auth
+              </span>
+            </div>
           </div>
         </div>
       </div>
