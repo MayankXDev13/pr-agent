@@ -71,33 +71,69 @@ Design and implement Convex database schema for users, sessions, repositories, p
 
 ---
 
-## PHASE 3: Authentication 🚧 IN PROGRESS
+## PHASE 3: Authentication ✅ COMPLETE
 
 ### Summary
 Implement GitHub OAuth authentication using Better Auth with Convex adapter. Set up admin seed script for initial admin account.
 
 ### Key Tasks
-1. Install Better Auth and dependencies
-2. Configure Convex adapter for Better Auth
-3. Set up GitHub OAuth provider with client ID and secret
-4. Create Better Auth client instance for frontend
-5. Implement OAuth callback handler
-6. Create login page with GitHub sign-in button
-7. Set up session management and persistence
-8. Create admin seed script that:
+1. ✅ Install Better Auth and dependencies
+2. ✅ Configure Convex adapter for Better Auth
+3. ✅ Set up GitHub OAuth provider with client ID and secret
+4. ✅ Create Better Auth client instance for frontend
+5. ✅ Implement OAuth callback handler
+6. ✅ Create login page with GitHub sign-in button
+7. ✅ Set up session management and persistence
+8. ✅ Create admin seed script that:
    - Runs on first application startup
    - Reads INITIAL_ADMIN_GITHUB_USERNAME from environment
    - Fetches user's GitHub profile to get userId
    - Inserts record into admin_users table
    - Logs admin creation
-9. Implement route protection middleware
-10. Create admin role verification function
+9. ✅ Implement route protection middleware
+10. ✅ Create admin role verification function
 
 ### Deliverables
-- Working GitHub OAuth login
-- User session management
-- Admin seed script functional
-- Protected routes configured
+- ✅ Working GitHub OAuth login
+- ✅ User session management
+- ✅ Admin seed script functional
+- ✅ Protected routes configured
+
+---
+
+## PHASE 4: GitHub Integration 🚧 IN PROGRESS
+
+### Summary
+Build GitHub API integration for repository management, PR fetching, webhook handling, and automatic review triggering.
+
+### Key Tasks
+1. Create GitHub API client using Octokit
+2. Implement repository add functionality:
+   - Fetch user's repositories from GitHub API
+   - Filter to show only user's own repos
+   - Store repo connection in database
+   - Set up webhook for connected repo
+3. Implement repository removal functionality
+4. Implement PR fetching:
+   - Fetch PR list for connected repos
+   - Fetch PR files and diffs
+   - Parse changed files and line changes
+5. Set up webhook endpoint for GitHub events:
+   - Handle pull_request opened event
+   - Handle pull_request synchronize event
+   - Implement hybrid triggering (auto + manual)
+6. Implement webhook authentication (secret verification)
+7. Implement GitHub comment posting:
+   - Post bot comment with review summary
+   - Create PR review with inline suggestions
+8. Handle webhook retry and error cases
+
+### Deliverables
+- GitHub API client functional
+- Repository add/remove working
+- PR fetching and diff parsing
+- Webhook endpoint operational
+- GitHub comments posting working
 
 ---
 
@@ -495,8 +531,8 @@ pr-agent/
 |-------|--------|-------------|
 | 1 | ✅ Complete | Project Setup |
 | 2 | ✅ Complete | Database Schema |
-| 3 | 🚧 In Progress | Authentication |
-| 4 | ⏳ Pending | GitHub Integration |
+| 3 | ✅ Complete | Authentication |
+| 4 | 🚧 In Progress | GitHub Integration |
 | 5 | ⏳ Pending | AI Review Engine |
 | 6 | ⏳ Pending | Frontend Dashboard |
 | 7 | ⏳ Pending | UI Components |
@@ -511,16 +547,16 @@ pr-agent/
 |-------|--------|--------|
 | 1. Project Setup | 1-2 days | ✅ Complete |
 | 2. Database Schema | 1 day | ✅ Complete |
-| 3. Authentication | 1-2 days | 🚧 In Progress |
-| 4. GitHub Integration | 2-3 days | ⏳ Pending |
+| 3. Authentication | 1-2 days | ✅ Complete |
+| 4. GitHub Integration | 2-3 days | 🚧 In Progress |
 | 5. AI Review Engine | 2-3 days | ⏳ Pending |
 | 6. Frontend Dashboard | 3-4 days | ⏳ Pending |
 | 7. UI Components | 2 days | ⏳ Pending |
 | 8. Admin Panel | 3-4 days | ⏳ Pending |
 | 9. Docker Deployment | 1 day | ⏳ Pending |
 
-**Progress: 2/9 phases complete (22%)**
-**Remaining: ~14-19 days estimated**
+**Progress: 3/9 phases complete (33%)**
+**Remaining: ~13-18 days estimated**
 
 ---
 
