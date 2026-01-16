@@ -1,3 +1,5 @@
+"use node";
+
 import { actionGeneric } from "convex/server";
 import { v } from "convex/values";
 import crypto from "crypto";

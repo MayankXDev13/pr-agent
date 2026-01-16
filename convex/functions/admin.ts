@@ -1,5 +1,29 @@
-import { queryGeneric, mutationGeneric, actionGeneric } from "convex/server";
+import { queryGeneric, mutationGeneric, actionGeneric, internalQueryGeneric, internalMutationGeneric } from "convex/server";
 import { v } from "convex/values";
+
+const _getAdminByUserId = internalQueryGeneric({
+  args: { userId: v.string() },
+  handler: async (ctx: any, args: any) => {
+    return await ctx.db
+      .query("admin_users")
+      .withIndex("by_userId", (q: any) => q.eq("userId", args.userId))
+      .first();
+  },
+});
+
+const _insertAdminUser = internalMutationGeneric({
+  args: {
+    userId: v.string(),
+    role: v.union(v.literal("admin"), v.literal("super_admin")),
+  },
+  handler: async (ctx: any, args: any) => {
+    return await ctx.db.insert("admin_users", {
+      userId: args.userId,
+      role: args.role,
+      createdAt: Date.now(),
+    });
+  },
+});
 
 export const getByUserId = queryGeneric({
   args: { userId: v.string() },
@@ -32,20 +56,16 @@ export const seedAdminUser = actionGeneric({
     }
 
     try {
-      const existingAdmin = await ctx.db
-        .query("admin_users")
-        .withIndex("by_userId", (q: any) => q.eq("userId", adminGithubUsername))
-        .first();
+      const existingAdmin = await ctx.runQuery(_getAdminByUserId, { userId: adminGithubUsername });
 
       if (existingAdmin) {
         console.log(`Admin ${adminGithubUsername} already exists`);
         return { success: true, message: "Admin already exists" };
       }
 
-      await ctx.db.insert("admin_users", {
+      await ctx.runMutation(_insertAdminUser, {
         userId: adminGithubUsername,
         role: "super_admin",
-        createdAt: Date.now(),
       });
 
       console.log(`Created admin user: ${adminGithubUsername}`);
