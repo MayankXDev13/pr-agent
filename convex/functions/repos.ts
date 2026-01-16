@@ -107,6 +107,39 @@ export const listPRsForRepo = queryGeneric({
   },
 });
 
+export const getPRByNumber = queryGeneric({
+  args: {
+    owner: v.string(),
+    repo: v.string(),
+    prNumber: v.number(),
+  },
+  handler: async (ctx: any, args: any) => {
+    const repo = await ctx.db
+      .query("repos")
+      .withIndex("by_fullName", (q: any) => q.eq("fullName", `${args.owner}/${args.repo}`))
+      .first();
+
+    if (!repo) return null;
+
+    return await ctx.db
+      .query("pullRequests")
+      .withIndex("by_prNumber", (q: any) =>
+        q.eq("repoId", repo._id).eq("prNumber", args.prNumber)
+      )
+      .first();
+  },
+});
+
+export const getRepoByName = queryGeneric({
+  args: { owner: v.string(), repo: v.string() },
+  handler: async (ctx: any, args: any) => {
+    return await ctx.db
+      .query("repos")
+      .withIndex("by_fullName", (q: any) => q.eq("fullName", `${args.owner}/${args.repo}`))
+      .first();
+  },
+});
+
 export const syncPRs = actionGeneric({
   args: {
     repoId: v.id("repos"),
