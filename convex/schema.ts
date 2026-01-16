@@ -39,7 +39,11 @@ export default defineSchema({
     description: v.optional(v.string()),
     defaultBranch: v.string(),
     isActive: v.boolean(),
+    webhookInstalled: v.boolean(),
     webhookId: v.optional(v.number()),
+    githubInstallationId: v.optional(v.string()),
+    lastCommitSha: v.optional(v.string()),
+    lastIndexedAt: v.optional(v.number()),
     settings: v.optional(v.object({
       autoIndex: v.boolean(),
       autoReview: v.boolean(),
@@ -56,7 +60,8 @@ export default defineSchema({
   })
     .index("by_userId", ["userId"])
     .index("by_fullName", ["fullName"])
-    .index("by_githubRepoId", ["githubRepoId"]),
+    .index("by_githubRepoId", ["githubRepoId"])
+    .index("by_installationId", ["githubInstallationId"]),
 
   codeChunks: defineTable({
     repoId: v.id("repositories"),
