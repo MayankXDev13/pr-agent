@@ -101,39 +101,78 @@ Implement GitHub OAuth authentication using Better Auth with Convex adapter. Set
 
 ---
 
-## PHASE 4: GitHub Integration 🚧 IN PROGRESS
+## PHASE 4: GitHub Integration ✅ COMPLETE
 
 ### Summary
 Build GitHub API integration for repository management, PR fetching, webhook handling, and automatic review triggering.
 
 ### Key Tasks
-1. Create GitHub API client using Octokit
-2. Implement repository add functionality:
+1. ✅ Create GitHub API client using Octokit
+2. ✅ Implement repository add functionality:
    - Fetch user's repositories from GitHub API
    - Filter to show only user's own repos
    - Store repo connection in database
    - Set up webhook for connected repo
-3. Implement repository removal functionality
-4. Implement PR fetching:
+3. ✅ Implement repository removal functionality
+4. ✅ Implement PR fetching:
    - Fetch PR list for connected repos
    - Fetch PR files and diffs
    - Parse changed files and line changes
-5. Set up webhook endpoint for GitHub events:
+5. ✅ Set up webhook endpoint for GitHub events:
    - Handle pull_request opened event
    - Handle pull_request synchronize event
    - Implement hybrid triggering (auto + manual)
-6. Implement webhook authentication (secret verification)
-7. Implement GitHub comment posting:
+6. ✅ Implement webhook authentication (secret verification)
+7. ✅ Implement GitHub comment posting:
    - Post bot comment with review summary
    - Create PR review with inline suggestions
-8. Handle webhook retry and error cases
+8. ✅ Handle webhook retry and error cases
 
 ### Deliverables
-- GitHub API client functional
-- Repository add/remove working
-- PR fetching and diff parsing
-- Webhook endpoint operational
-- GitHub comments posting working
+- ✅ GitHub API client functional (src/lib/github.ts)
+- ✅ Repository add/remove working (convex/functions/repos.ts)
+- ✅ PR fetching and diff parsing
+- ✅ Webhook endpoint operational (src/app/api/webhooks/github/route.ts)
+- ✅ GitHub comments posting working (convex/functions/reviews.ts)
+
+---
+
+## PHASE 5: AI Review Engine 🚧 IN PROGRESS
+
+### Summary
+Implement AI-powered PR review using Vercel AI SDK with OpenRouter provider. Real-time streaming to UI with structured output parsing.
+
+### Key Tasks
+1. Set up Vercel AI SDK with OpenRouter provider
+2. Configure Llama 3.3 70B model via OpenRouter
+3. Create review prompt templates:
+   - Summary template (high-level PR overview)
+   - Bug detection template (potential bugs/issues)
+   - Security template (vulnerabilities)
+   - Style template (code style violations)
+   - Suggestion template (improvement recommendations)
+4. Design structured output schema for findings:
+   - Finding type (bug/security/style/suggestion/info)
+   - File path
+   - Line number
+   - Message
+   - Severity level (low/medium/high/critical)
+5. Implement single combined review prompt
+6. Set up streaming response handling
+7. Implement real-time streaming UI updates
+8. Store complete review in database
+9. Implement notification system:
+   - Dashboard notification
+   - GitHub comment posting
+   - Email notification (via API)
+   - Webhook notification (Slack/Discord)
+10. No rate limits (unlimited reviews per user)
+
+### Deliverables
+- AI review engine working
+- Structured output parsing functional
+- Real-time streaming to UI
+- All notification channels working
 
 ---
 
@@ -532,8 +571,8 @@ pr-agent/
 | 1 | ✅ Complete | Project Setup |
 | 2 | ✅ Complete | Database Schema |
 | 3 | ✅ Complete | Authentication |
-| 4 | 🚧 In Progress | GitHub Integration |
-| 5 | ⏳ Pending | AI Review Engine |
+| 4 | ✅ Complete | GitHub Integration |
+| 5 | 🚧 In Progress | AI Review Engine |
 | 6 | ⏳ Pending | Frontend Dashboard |
 | 7 | ⏳ Pending | UI Components |
 | 8 | ⏳ Pending | Admin Panel |
@@ -548,15 +587,15 @@ pr-agent/
 | 1. Project Setup | 1-2 days | ✅ Complete |
 | 2. Database Schema | 1 day | ✅ Complete |
 | 3. Authentication | 1-2 days | ✅ Complete |
-| 4. GitHub Integration | 2-3 days | 🚧 In Progress |
-| 5. AI Review Engine | 2-3 days | ⏳ Pending |
+| 4. GitHub Integration | 2-3 days | ✅ Complete |
+| 5. AI Review Engine | 2-3 days | 🚧 In Progress |
 | 6. Frontend Dashboard | 3-4 days | ⏳ Pending |
 | 7. UI Components | 2 days | ⏳ Pending |
 | 8. Admin Panel | 3-4 days | ⏳ Pending |
 | 9. Docker Deployment | 1 day | ⏳ Pending |
 
-**Progress: 3/9 phases complete (33%)**
-**Remaining: ~13-18 days estimated**
+**Progress: 4/9 phases complete (44%)**
+**Remaining: ~11-16 days estimated**
 
 ---
 
