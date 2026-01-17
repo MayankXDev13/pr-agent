@@ -2,14 +2,7 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import {
-  GitPullRequest,
-  Filter,
-  ArrowUpDown,
-  CheckCircle,
-  XCircle,
-  GitMerge,
-} from "lucide-react";
+import { FaGithub, FaFilter, FaSort, FaCheckCircle, FaTimesCircle, FaCodeBranch } from "react-icons/fa";
 import { useState } from "react";
 
 interface MockPR {
@@ -119,7 +112,7 @@ export default function PRListPage() {
 
       {filteredPRs.length === 0 ? (
         <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
-          <GitPullRequest className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+          <FaGithub className="h-12 w-12 mx-auto text-gray-400 mb-4" />
           <h3 className="text-lg font-medium mb-2">No pull requests</h3>
           <p className="text-gray-600">
             {filter === "all"
@@ -137,11 +130,11 @@ export default function PRListPage() {
             >
               <div className="flex items-start gap-4">
                 {pr.state === "open" ? (
-                  <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+                  <FaCheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                 ) : pr.mergedAt ? (
-                  <GitMerge className="h-5 w-5 text-purple-600 mt-0.5" />
+                  <FaCodeBranch className="h-5 w-5 text-purple-600 mt-0.5" />
                 ) : (
-                  <XCircle className="h-5 w-5 text-gray-400 mt-0.5" />
+                  <FaTimesCircle className="h-5 w-5 text-gray-400 mt-0.5" />
                 )}
                 <div className="flex-1 min-w-0">
                   <h3 className="font-medium truncate">{pr.title}</h3>

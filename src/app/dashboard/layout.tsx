@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Code2, LayoutDashboard, FolderGit2, Settings, LogOut } from "lucide-react";
+import { FaCode, FaBuffer, FaGithub, FaCog, FaSignOutAlt } from "react-icons/fa";
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Repositories", href: "/dashboard/repos", icon: FolderGit2 },
+  { name: "Dashboard", href: "/dashboard", icon: FaBuffer },
+  { name: "Repositories", href: "/dashboard/repos", icon: FaGithub },
 ];
 
 export default function DashboardLayout({
@@ -18,10 +18,9 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Sidebar */}
       <aside className="fixed inset-y-0 left-0 w-64 border-r border-gray-200 bg-white">
         <div className="flex h-16 items-center gap-2 px-6 border-b border-gray-200">
-          <Code2 className="h-8 w-8" />
+          <FaCode className="h-8 w-8" />
           <span className="text-xl font-bold">PR Agent</span>
         </div>
 
@@ -50,17 +49,16 @@ export default function DashboardLayout({
             href="/admin"
             className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
           >
-            <Settings className="h-5 w-5" />
+            <FaCog className="h-5 w-5" />
             Admin
           </Link>
           <button className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors w-full">
-            <LogOut className="h-5 w-5" />
+            <FaSignOutAlt className="h-5 w-5" />
             Sign Out
           </button>
         </div>
       </aside>
 
-      {/* Main content */}
       <main className="pl-64">
         <div className="p-8">{children}</div>
       </main>

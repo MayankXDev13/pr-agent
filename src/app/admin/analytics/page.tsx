@@ -1,6 +1,6 @@
 "use client";
 
-import { TrendingUp, TrendingDown, Users, FileText, Clock, AlertCircle } from "lucide-react";
+import { FaChartLine, FaUsers, FaFileAlt, FaClock, FaExclamationCircle } from "react-icons/fa";
 
 const MOCK_CHART_DATA = {
   reviewsByDay: [
@@ -61,7 +61,7 @@ export default function AdminAnalyticsPage() {
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm text-gray-600">Total Reviews</span>
             <span className="flex items-center gap-1 text-green-600 text-sm">
-              <TrendingUp className="h-4 w-4" />
+              <FaChartLine className="h-4 w-4" />
               +12%
             </span>
           </div>
@@ -73,7 +73,7 @@ export default function AdminAnalyticsPage() {
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm text-gray-600">Avg Review Time</span>
             <span className="flex items-center gap-1 text-green-600 text-sm">
-              <TrendingDown className="h-4 w-4" />
+              <FaChartLine className="h-4 w-4" style={{ transform: 'rotate(180deg)' }} />
               -8%
             </span>
           </div>
@@ -85,7 +85,7 @@ export default function AdminAnalyticsPage() {
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm text-gray-600">Findings Rate</span>
             <span className="flex items-center gap-1 text-red-600 text-sm">
-              <TrendingUp className="h-4 w-4" />
+              <FaChartLine className="h-4 w-4" />
               +5%
             </span>
           </div>
@@ -97,7 +97,7 @@ export default function AdminAnalyticsPage() {
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm text-gray-600">Completion Rate</span>
             <span className="flex items-center gap-1 text-green-600 text-sm">
-              <TrendingUp className="h-4 w-4" />
+              <FaChartLine className="h-4 w-4" />
               +2%
             </span>
           </div>
@@ -187,7 +187,7 @@ export default function AdminAnalyticsPage() {
           </div>
           <div className="mt-4 pt-4 border-t border-gray-200">
             <div className="flex items-center gap-2 text-sm text-green-600">
-              <TrendingDown className="h-4 w-4" />
+              <FaChartLine className="h-4 w-4" style={{ transform: 'rotate(180deg)' }} />
               28% faster review times over the past month
             </div>
           </div>
@@ -196,7 +196,7 @@ export default function AdminAnalyticsPage() {
 
       <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
         <div className="flex items-center gap-2 text-yellow-700">
-          <AlertCircle className="h-5 w-5" />
+          <FaExclamationCircle className="h-5 w-5" />
           <span className="font-medium">Note:</span>
           <span className="text-sm">
             Charts use mock data. Connect to Convex database for real analytics.

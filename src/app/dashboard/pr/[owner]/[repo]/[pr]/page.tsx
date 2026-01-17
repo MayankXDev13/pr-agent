@@ -2,16 +2,7 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  GitPullRequest,
-  Clock,
-  User,
-  GitBranch,
-  ExternalLink,
-  AlertTriangle,
-  CheckCircle,
-} from "lucide-react";
+import { FaArrowLeft, FaGithub, FaClock, FaUser, FaCodeBranch, FaExternalLinkAlt, FaExclamationTriangle, FaCheckCircle } from "react-icons/fa";
 import { useState, useCallback } from "react";
 import FileDiffViewer from "@/src/components/dashboard/FileDiffViewer";
 
@@ -70,29 +61,29 @@ const MOCK_FILES: FileChange[] = [
    clientId: string;
    clientSecret: string;
    redirectUri: string;
-+  scope: string[];
-+  state: string;
+ +  scope: string[];
+ +  state: string;
  }
  
  export class GitHubAuth {
    private config: AuthConfig;
-@@ -38,6 +40,10 @@ export class GitHubAuth {
+ @@ -38,6 +40,10 @@ export class GitHubAuth {
      return config.redirectUri;
    }
  
-+  validateState(state: string): boolean {
-+    return this.config.state === state;
-+  }
-+
+ +  validateState(state: string): boolean {
+ +    return this.config.state === state;
+ +  }
+ +
    async exchangeCodeForToken(code: string): Promise<string> {
      const response = await fetch("https://github.com/login/oauth/access_token", {
        method: "POST",
-@@ -45,7 +51,7 @@ export class GitHubAuth {
+ @@ -45,7 +51,7 @@ export class GitHubAuth {
          "Content-Type": "application/json",
          Accept: "application/json",
        },
--      body: JSON.stringify({ client_id, client_secret, code }),
-+      body: JSON.stringify({ client_id, client_secret, code, redirect_uri }),
+ -      body: JSON.stringify({ client_id, client_secret, code }),
+ +      body: JSON.stringify({ client_id, client_secret, code, redirect_uri }),
      });
  
      const data = await response.json();`,
@@ -106,14 +97,14 @@ const MOCK_FILES: FileChange[] = [
      }
    };
  
-+  if (error) {
-+    return (
-+      <div className="error">
-+        Authentication failed: {error}
-+      </div>
-+    );
-+  }
-+
+ +  if (error) {
+ +    return (
+ +      <div className="error">
+ +        Authentication failed: {error}
+ +      </div>
+ +    );
+ +  }
+ +
    return (
      <div className="login-container">
        <h1>Sign in with GitHub</h1>`,
@@ -129,8 +120,8 @@ const MOCK_FILES: FileChange[] = [
    clientId: process.env.GITHUB_CLIENT_ID!,
    clientSecret: process.env.GITHUB_CLIENT_SECRET!,
    redirectUri: process.env.AUTH_URL + "/api/auth/callback",
-+  scope: ["user:email", "read:org"],
-+  state: generateRandomString(32),
+ +  scope: ["user:email", "read:org"],
+ +  state: generateRandomString(32),
  });
  
  export async function GET(request: Request) {`,
@@ -143,18 +134,18 @@ const MOCK_FILES: FileChange[] = [
     patch: `@@ -1,5 +1,11 @@
  # PR Agent
  
-+## Features
-+
-+- AI-powered code review
-+- GitHub OAuth integration
-+- Real-time streaming reviews
-+- Multi-severity findings
-+
+ +## Features
+ +
+ +- AI-powered code review
+ +- GitHub OAuth integration
+ +- Real-time streaming reviews
+ +- Multi-severity findings
+ +
  ## Getting Started
  
  \`\`\`bash
  bun install
-\`\`\``,
+ \`\`\``,
   },
 ];
 
@@ -295,14 +286,14 @@ export default function PRDetailPage() {
           href={`/dashboard/pr/${owner}/${repo}`}
           className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-black transition-colors mb-4"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <FaArrowLeft className="h-4 w-4" />
           Back to PRs
         </Link>
 
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <GitPullRequest className="h-6 w-6" />
+              <FaGithub className="h-6 w-6" />
               <h1 className="text-2xl font-bold">PR #{pr.prNumber}: {pr.title}</h1>
               <span className={`px-2 py-1 text-sm rounded-full ${
                 pr.state === "open"
@@ -314,15 +305,15 @@ export default function PRDetailPage() {
             </div>
             <div className="flex items-center gap-4 text-sm text-gray-600">
               <span className="flex items-center gap-1">
-                <User className="h-4 w-4" />
+                <FaUser className="h-4 w-4" />
                 {pr.author}
               </span>
               <span className="flex items-center gap-1">
-                <GitBranch className="h-4 w-4" />
+                <FaCodeBranch className="h-4 w-4" />
                 {pr.baseBranch} → {pr.headBranch}
               </span>
               <span className="flex items-center gap-1">
-                <Clock className="h-4 w-4" />
+                <FaClock className="h-4 w-4" />
                 {new Date(pr.createdAt).toLocaleDateString()}
               </span>
             </div>
@@ -333,7 +324,7 @@ export default function PRDetailPage() {
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
           >
-            <ExternalLink className="h-4 w-4" />
+            <FaExternalLinkAlt className="h-4 w-4" />
             View on GitHub
           </a>
         </div>
@@ -496,12 +487,12 @@ export default function PRDetailPage() {
                 <span className="text-gray-600">Review Status</span>
                 {reviews.length > 0 ? (
                   <span className="flex items-center gap-1 text-green-600">
-                    <CheckCircle className="h-4 w-4" />
+                    <FaCheckCircle className="h-4 w-4" />
                     Reviewed
                   </span>
                 ) : (
                   <span className="flex items-center gap-1 text-yellow-600">
-                    <AlertTriangle className="h-4 w-4" />
+                    <FaExclamationTriangle className="h-4 w-4" />
                     Pending
                   </span>
                 )}

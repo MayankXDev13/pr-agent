@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Plus, FolderGit2, Trash2, ExternalLink, Loader2, RefreshCw, Github } from "lucide-react";
+import { FaPlus, FaGithub, FaTrash, FaExternalLinkAlt, FaSpinner, FaSync } from "react-icons/fa";
 
 interface Repo {
   _id: string;
@@ -66,12 +66,6 @@ export default function ReposPage() {
     setLoading(true);
     setError(null);
     try {
-      // TODO: Connect to Convex query "listByUserId"
-      // const convex = createClient();
-      // const userRepos = await convex.query("listByUserId", { userId: userId });
-      // setRepos(userRepos);
-
-      // Mock data for demo
       await new Promise((resolve) => setTimeout(resolve, 500));
       setRepos(MOCK_REPOS);
     } catch (err) {
@@ -85,8 +79,6 @@ export default function ReposPage() {
     setSyncing(true);
     setError(null);
     try {
-      // TODO: Call Convex action "syncFromGitHub"
-      // await convex.action("syncFromGitHub", { userId, accessToken });
       await fetchRepos();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Sync failed");
@@ -99,8 +91,6 @@ export default function ReposPage() {
     if (!confirm("Are you sure you want to remove this repository?")) return;
 
     try {
-      // TODO: Call Convex mutation "repos.remove"
-      // await convex.mutation("repos.remove", { id: repoId });
       setRepos((prev) => prev.filter((r) => r._id !== repoId));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Remove failed");
@@ -109,8 +99,6 @@ export default function ReposPage() {
 
   const addRepo = useCallback(async (fullName: string) => {
     try {
-      // TODO: Call Convex mutation "repos.add"
-      // await convex.mutation("repos.add", { ... });
       await fetchRepos();
       setShowRepoPicker(false);
     } catch (err) {
@@ -148,9 +136,9 @@ export default function ReposPage() {
             className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
           >
             {syncing ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <FaSpinner className="h-4 w-4 animate-spin" />
             ) : (
-              <RefreshCw className="h-4 w-4" />
+              <FaSync className="h-4 w-4" />
             )}
             Sync from GitHub
           </button>
@@ -158,7 +146,7 @@ export default function ReposPage() {
             onClick={() => setShowRepoPicker(true)}
             className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
           >
-            <Plus className="h-4 w-4" />
+            <FaPlus className="h-4 w-4" />
             Add Repository
           </button>
         </div>
@@ -172,11 +160,11 @@ export default function ReposPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+          <FaSpinner className="h-8 w-8 animate-spin text-gray-400" />
         </div>
       ) : repos.length === 0 ? (
         <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
-          <FolderGit2 className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+          <FaGithub className="h-12 w-12 mx-auto text-gray-400 mb-4" />
           <h3 className="text-lg font-medium mb-2">No repositories connected</h3>
           <p className="text-gray-600 mb-4">
             Sync from your GitHub account or add repositories manually
@@ -204,7 +192,7 @@ export default function ReposPage() {
               className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
             >
               <div className="flex items-center gap-4">
-                <FolderGit2 className="h-8 w-8 text-gray-600" />
+                <FaGithub className="h-8 w-8 text-gray-600" />
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="font-medium">{repo.fullName}</h3>
@@ -242,21 +230,21 @@ export default function ReposPage() {
                   className="p-2 text-gray-600 hover:text-black transition-colors"
                   title="View on GitHub"
                 >
-                  <ExternalLink className="h-5 w-5" />
+                  <FaExternalLinkAlt className="h-5 w-5" />
                 </a>
                 <a
                   href={`/dashboard/pr/${repo.owner}/${repo.name}`}
                   className="p-2 text-gray-600 hover:text-black transition-colors"
                   title="View Pull Requests"
                 >
-                  <Github className="h-5 w-5" />
+                  <FaGithub className="h-5 w-5" />
                 </a>
                 <button
                   onClick={() => removeRepo(repo._id)}
                   className="p-2 text-gray-600 hover:text-red-600 transition-colors"
                   title="Remove repository"
                 >
-                  <Trash2 className="h-5 w-5" />
+                  <FaTrash className="h-5 w-5" />
                 </button>
               </div>
             </div>

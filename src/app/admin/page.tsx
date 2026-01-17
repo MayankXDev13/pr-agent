@@ -1,4 +1,4 @@
-import { Users, GitBranch, FileText, Clock, TrendingUp, AlertCircle, Settings } from "lucide-react";
+import { FaUsers, FaCodeBranch, FaFileAlt, FaClock, FaChartLine, FaExclamationTriangle, FaCog } from "react-icons/fa";
 
 const MOCK_STATS = {
   totalUsers: 156,
@@ -35,9 +35,9 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <Users className="h-8 w-8 text-blue-600" />
+            <FaUsers className="h-8 w-8 text-blue-600" />
             <span className="text-green-600 text-sm flex items-center gap-1">
-              <TrendingUp className="h-4 w-4" />
+              <FaChartLine className="h-4 w-4" />
               +{MOCK_STATS.usersThisWeek}
             </span>
           </div>
@@ -47,7 +47,7 @@ export default function AdminDashboardPage() {
 
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <GitBranch className="h-8 w-8 text-green-600" />
+            <FaCodeBranch className="h-8 w-8 text-green-600" />
           </div>
           <div className="text-3xl font-bold">{MOCK_STATS.totalRepos}</div>
           <div className="text-sm text-gray-600">Connected Repos</div>
@@ -55,9 +55,9 @@ export default function AdminDashboardPage() {
 
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <FileText className="h-8 w-8 text-purple-600" />
+            <FaFileAlt className="h-8 w-8 text-purple-600" />
             <span className="text-green-600 text-sm flex items-center gap-1">
-              <TrendingUp className="h-4 w-4" />
+              <FaChartLine className="h-4 w-4" />
               +{MOCK_STATS.reviewsToday}
             </span>
           </div>
@@ -67,7 +67,7 @@ export default function AdminDashboardPage() {
 
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <Clock className="h-8 w-8 text-orange-600" />
+            <FaClock className="h-8 w-8 text-orange-600" />
           </div>
           <div className="text-3xl font-bold">{MOCK_STATS.avgReviewTime}</div>
           <div className="text-sm text-gray-600">Avg Review Time</div>
@@ -133,7 +133,7 @@ export default function AdminDashboardPage() {
           </div>
           <div className="mt-4 pt-4 border-t border-gray-200">
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <AlertCircle className="h-4 w-4" />
+              <FaExclamationTriangle className="h-4 w-4" />
               GitHub API experiencing higher than normal latency
             </div>
           </div>
@@ -144,19 +144,19 @@ export default function AdminDashboardPage() {
         <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
         <div className="grid grid-cols-4 gap-4">
           <a href="/admin/users" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center">
-            <Users className="h-8 w-8 mx-auto mb-2 text-gray-600" />
+            <FaUsers className="h-8 w-8 mx-auto mb-2 text-gray-600" />
             <span className="font-medium">Manage Users</span>
           </a>
           <a href="/admin/repos" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center">
-            <GitBranch className="h-8 w-8 mx-auto mb-2 text-gray-600" />
+            <FaCodeBranch className="h-8 w-8 mx-auto mb-2 text-gray-600" />
             <span className="font-medium">View Repos</span>
           </a>
           <a href="/admin/analytics" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center">
-            <TrendingUp className="h-8 w-8 mx-auto mb-2 text-gray-600" />
+            <FaChartLine className="h-8 w-8 mx-auto mb-2 text-gray-600" />
             <span className="font-medium">Analytics</span>
           </a>
           <a href="/admin/settings" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center">
-            <Settings className="h-8 w-8 mx-auto mb-2 text-gray-600" />
+            <FaCog className="h-8 w-8 mx-auto mb-2 text-gray-600" />
             <span className="font-medium">Settings</span>
           </a>
         </div>

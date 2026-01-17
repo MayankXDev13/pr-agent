@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, MoreVertical, Shield, Mail, Calendar, Eye, Ban, CheckCircle, XCircle } from "lucide-react";
+import { FaSearch, FaEllipsisV, FaShieldAlt, FaEnvelope, FaCalendar, FaEye, FaBan, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 interface User {
   id: string;
@@ -107,7 +107,7 @@ export default function AdminUsersPage() {
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
-            <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <FaSearch className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Search users..."
@@ -164,9 +164,9 @@ export default function AdminUsersPage() {
                       : "bg-red-100 text-red-700"
                   }`}>
                     {user.status === "active" ? (
-                      <CheckCircle className="h-3 w-3" />
+                      <FaCheckCircle className="h-3 w-3" />
                     ) : (
-                      <XCircle className="h-3 w-3" />
+                      <FaTimesCircle className="h-3 w-3" />
                     )}
                     {user.status}
                   </span>
@@ -190,13 +190,13 @@ export default function AdminUsersPage() {
                       className="p-2 text-gray-600 hover:text-black transition-colors"
                       title="View Details"
                     >
-                      <Eye className="h-4 w-4" />
+                      <FaEye className="h-4 w-4" />
                     </button>
                     <button
                       className="p-2 text-gray-600 hover:text-black transition-colors"
                       title="More Actions"
                     >
-                      <MoreVertical className="h-4 w-4" />
+                      <FaEllipsisV className="h-4 w-4" />
                     </button>
                   </div>
                 </td>
@@ -221,7 +221,7 @@ export default function AdminUsersPage() {
                 onClick={() => setSelectedUser(null)}
                 className="p-2 hover:bg-gray-100 rounded-md"
               >
-                <XCircle className="h-5 w-5" />
+                <FaTimesCircle className="h-5 w-5" />
               </button>
             </div>
 
@@ -242,21 +242,21 @@ export default function AdminUsersPage() {
                 <div>
                   <label className="text-sm text-gray-500">Email</label>
                   <div className="flex items-center gap-2 mt-1">
-                    <Mail className="h-4 w-4 text-gray-400" />
+                    <FaEnvelope className="h-4 w-4 text-gray-400" />
                     <span>{selectedUser.email}</span>
                   </div>
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Status</label>
                   <div className="flex items-center gap-2 mt-1">
-                    <Shield className="h-4 w-4 text-gray-400" />
+                    <FaShieldAlt className="h-4 w-4 text-gray-400" />
                     <span className="capitalize">{selectedUser.status}</span>
                   </div>
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Joined</label>
                   <div className="flex items-center gap-2 mt-1">
-                    <Calendar className="h-4 w-4 text-gray-400" />
+                    <FaCalendar className="h-4 w-4 text-gray-400" />
                     <span>{formatDate(selectedUser.createdAt)}</span>
                   </div>
                 </div>
@@ -269,17 +269,17 @@ export default function AdminUsersPage() {
               <div className="flex gap-2 pt-4 border-t">
                 {selectedUser.status === "active" ? (
                   <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-red-200 text-red-700 rounded-md hover:bg-red-50 transition-colors">
-                    <Ban className="h-4 w-4" />
+                    <FaBan className="h-4 w-4" />
                     Suspend User
                   </button>
                 ) : (
                   <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-green-200 text-green-700 rounded-md hover:bg-green-50 transition-colors">
-                    <CheckCircle className="h-4 w-4" />
+                    <FaCheckCircle className="h-4 w-4" />
                     Activate User
                   </button>
                 )}
                 <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
-                  <Mail className="h-4 w-4" />
+                  <FaEnvelope className="h-4 w-4" />
                   Send Message
                 </button>
               </div>

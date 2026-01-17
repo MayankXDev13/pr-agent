@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Loader2, Search, Filter } from "lucide-react";
+import { FaSpinner, FaSearch, FaFilter } from "react-icons/fa";
 import { ReviewCard, ReviewFilters } from "../../../components/dashboard/ReviewCard";
 import { ScoreDistributionChart } from "../../../components/dashboard/ScoreCard";
 
@@ -96,7 +96,6 @@ export default function ReviewsPage() {
   const fetchReviews = useCallback(async () => {
     setLoading(true);
     try {
-      // TODO: Connect to Convex query
       await new Promise((resolve) => setTimeout(resolve, 500));
       setReviews(MOCK_REVIEWS);
     } catch (error) {
@@ -140,7 +139,7 @@ export default function ReviewsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+          <FaSpinner className="h-8 w-8 animate-spin text-gray-400" />
         </div>
       ) : (
         <>
@@ -148,7 +147,7 @@ export default function ReviewsPage() {
             <div className="lg:col-span-3 space-y-4">
               <div className="flex items-center gap-2">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     type="text"
                     placeholder="Search reviews..."
@@ -163,7 +162,7 @@ export default function ReviewsPage() {
                     showFilters ? "bg-gray-100" : ""
                   }`}
                 >
-                  <Filter className="h-4 w-4" />
+                  <FaFilter className="h-4 w-4" />
                 </button>
               </div>
 

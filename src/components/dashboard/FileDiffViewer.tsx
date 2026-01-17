@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronRight, FileDiff, Plus, Minus } from "lucide-react";
+import { FaChevronDown, FaChevronRight, FaPlus, FaMinus } from "react-icons/fa";
 
 interface FileChange {
   filename: string;
@@ -70,11 +70,11 @@ export default function FileDiffViewer({ files }: FileDiffViewerProps) {
           <h3 className="font-semibold">Changed Files</h3>
           <div className="flex items-center gap-4 text-sm">
             <span className="flex items-center gap-1 text-green-600">
-              <Plus className="h-4 w-4" />
+              <FaPlus className="h-4 w-4" />
               {totalAdditions}
             </span>
             <span className="flex items-center gap-1 text-red-600">
-              <Minus className="h-4 w-4" />
+              <FaMinus className="h-4 w-4" />
               {totalDeletions}
             </span>
             <span className="text-gray-600">{files.length} files</span>
@@ -94,11 +94,10 @@ export default function FileDiffViewer({ files }: FileDiffViewerProps) {
                 className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left"
               >
                 {isExpanded ? (
-                  <ChevronDown className="h-4 w-4 text-gray-500" />
+                  <FaChevronDown className="h-4 w-4 text-gray-500" />
                 ) : (
-                  <ChevronRight className="h-4 w-4 text-gray-500" />
+                  <FaChevronRight className="h-4 w-4 text-gray-500" />
                 )}
-                <FileDiff className="h-4 w-4 text-gray-500" />
                 <span className="font-mono text-sm flex-1">{file.filename}</span>
                 <span className={`text-xs px-2 py-1 rounded-full ${
                   file.status === "added"
@@ -162,7 +161,6 @@ export default function FileDiffViewer({ files }: FileDiffViewerProps) {
 
       {files.length === 0 && (
         <div className="text-center py-8 text-gray-500">
-          <FileDiff className="h-8 w-8 mx-auto mb-2 text-gray-400" />
           <p>No files changed</p>
         </div>
       )}
